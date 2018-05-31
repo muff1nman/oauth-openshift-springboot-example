@@ -1,0 +1,14 @@
+security:
+  oauth2:
+    client:
+      clientId: REPLACE_ME
+      clientSecret: REPLACE_ME
+      accessTokenUri: https://openshift.default.svc/oauth/token
+      userAuthorizationUri: REPLACE_ME
+      tokenName: access_token
+      authenticationScheme: header
+      clientAuthenticationScheme: query
+      scope: "user:info user:check-access user:list-projects"
+    resource:
+      userInfoUri: https://openshift.default.svc/oapi/v1/users/~
+
