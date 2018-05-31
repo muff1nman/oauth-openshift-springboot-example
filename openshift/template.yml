@@ -1,24 +1,20 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: openjdk18-web-basic-s2i
-  xpaas: 1.4.7
-message: A new java application has been created in your project.
+  template: openjdk18-oauth-springboot-s2i
+message: A new Spring Boot application has been created in your project.
 metadata:
   annotations:
-    description: An example Java application using OpenJDK 8. For more information
-      about using this template, see https://github.com/jboss-openshift/application-templates.
+    description: An example Spring Boot application using OAuth for authentication. For more information
+      about using this template, see https://github.com/muff1nman/oauth-openshift-springboot-example.
     iconClass: icon-rh-openjdk
-    openshift.io/display-name: OpenJDK 8
-    openshift.io/provider-display-name: Red Hat, Inc.
+    openshift.io/display-name: Spring Boot OAuth
     tags: java
-    template.openshift.io/documentation-url: https://access.redhat.com/documentation/en/
-    template.openshift.io/long-description: This template defines resources needed
-      to develop Red Hat OpenJDK Java 8 based application.
-    template.openshift.io/support-url: https://access.redhat.com
-    version: 1.4.7
+    template.openshift.io/documentation-url: https://github.com/muff1nman/oauth-openshift-springboot-example
+    template.openshift.io/long-description: This template defines an example Spring Boot Java 8 application that uses
+     the OpenShift OAuth resource server for authentication.
   creationTimestamp: null
-  name: openjdk18-web-basic-s2i
+  name: openjdk18-oauth-springboot-s2i
 objects:
 - apiVersion: v1
   kind: Service
@@ -71,7 +67,9 @@ objects:
         kind: ImageStreamTag
         name: ${APPLICATION_NAME}:latest
     source:
-      type: Binary
+      type: Source
+      git:
+        uri: https://github.com/muff1nman/oauth-openshift-springboot-example.git
     strategy:
       sourceStrategy:
         env:
@@ -83,7 +81,10 @@ objects:
           name: redhat-openjdk18-openshift:1.2
           namespace: ${IMAGE_STREAM_NAMESPACE}
       type: Source
-    triggers: []
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
 - apiVersion: v1
   kind: ServiceAccount
   metadata:
@@ -147,19 +148,20 @@ objects:
         terminationGracePeriodSeconds: 75
     triggers:
     - imageChangeParams:
-        automatic: false
+        automatic: true
         containerNames:
         - ${APPLICATION_NAME}
         from:
           kind: ImageStreamTag
           name: ${APPLICATION_NAME}:latest
       type: ImageChange
+    - type: ConfigChange
 parameters:
 - description: The name for the application.
   displayName: Application Name
   name: APPLICATION_NAME
   required: true
-  value: openjdk-app
+  value: spring-boot-oauth-app
 - description: 'Custom hostname for http service route.  Leave blank for default hostname,
     e.g.: <application-name>-<project>.<default-domain-suffix>'
   displayName: Custom http Route Hostname
