@@ -1,5 +1,6 @@
-Securing Spring Boot with OpenShift and OAuth
-======
+% Securing Spring Boot with OpenShift and OAuth Part 1
+% Andrew DeMaria
+% 2018-06-04
 
 Quickly securing an application has become quite simple with Spring Boot.
 However, if you're running on OpenShift - it can be even easier by relying on
@@ -104,20 +105,20 @@ spring-boot-oauth-app-oauth-example.192.168.42.46.nip.io
 
 Note that it redirected us to the OpenShift login page:
 
-[[images/oauth-prompt-1.png]]
+![OAuth Prompt](images/oauth-prompt-1.png)
 
 After filling out your password, we get another page telling us about what this application is requesting some
 permissions. These permissions are also called scopes:
 
-[[images/oauth-prompt-2.png]]
+![Permissions OAuth Prompt](images/oauth-prompt-2.png)
 
 If these permissions are accepted, then the user is redirected to the login page and is successfully authenticated:
 
-[[images/oauth-form.png]]
+![OAuth Protected Form](images/oauth-form.png)
 
 Stay tuned for the next part where we will take a look at the underlying configuration. If you're interested in more
-about how OAuth works, I like the graphical document [1](here). For documentation on OAuth and OpenShift see the [1]
-(OpenShift Docs).
+about how OAuth works, I like the graphical document [here][2]. For documentation on OAuth and OpenShift see the
+[OpenShift Docs][1].
 
-1. https://docs.openshift.com/container-platform/3.6/architecture/additional_concepts/authentication.html#oauth
-2. https://docs.oracle.com/cd/E50612_01/doc.11122/oauth_guide/content/oauth_flows.html
+[1]: https://docs.openshift.com/container-platform/3.6/architecture/additional_concepts/authentication.html#oauth
+[2]: https://docs.oracle.com/cd/E50612_01/doc.11122/oauth_guide/content/oauth_flows.html
