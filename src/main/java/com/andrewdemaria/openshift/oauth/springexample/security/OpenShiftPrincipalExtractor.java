@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class OpenShiftPrincipleExtractor implements PrincipalExtractor {
+public class OpenShiftPrincipalExtractor implements PrincipalExtractor {
 
-    private static final Logger logger = LoggerFactory.getLogger(OpenShiftPrincipleExtractor.class);
+    private static final Logger logger = LoggerFactory.getLogger(OpenShiftPrincipalExtractor.class);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -18,7 +18,7 @@ public class OpenShiftPrincipleExtractor implements PrincipalExtractor {
         try {
             return ((Map<String, Object>) map.get("metadata")).get("name");
         } catch (Exception e) {
-            logger.warn("Could not read principle name", e);
+            logger.warn("Could not read principal name", e);
             return null;
         }
     }
