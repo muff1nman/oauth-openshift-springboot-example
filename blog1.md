@@ -10,7 +10,7 @@ we'll take a look at how this can be done.
 1. Deploying an OAuth Spring Boot Example Application onto OpenShift
 2. The Basic configuration for OAuth, Spring Boot and OpenShift
 3. AUTOMATIC!! configuration for OAuth, Spring Boot and OpenShift
-4. Principle Extractors for OpenShift OAuth
+4. Authorities Extractor for OpenShift OAuth
 5. Interacting with the OpenShift API using an OAuth Token
 
 ## Part 1 - Deploying an OAuth Spring Boot Example Application onto OpenShift
