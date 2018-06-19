@@ -36,13 +36,13 @@ security:
 ### Adding a `run.sh` script
 
 Instead of configuring the `REPLACE_ME` items manually, we can inject these properties into our application at runtime.
-Now do note that in order to do this we are relying on functionality within the
-OpenShift OpenJDK S2I image: `redhat-openjdk-18/openjdk18-openshift`. Namely, the fact that we can supply a `run.sh`
-script that the image will run instead of its normal script, `run-java.sh`. This can be seen by taking a look at the
-image contents via `oc run`:
+In order to do this we will rely on functionality within the
+OpenShift OpenJDK S2I image: `redhat-openjdk-18/openjdk18-openshift`. Namely, we will use the fact that we can supply a
+`run.sh` script that the image will run instead of its normal script, `run-java.sh`. This functionality can be seen by
+taking a look at the image contents via `oc run`:
 
 ```
- oc run -it --restart=Never javatest --image=redhat-openjdk-18/openjdk18-openshift --command -- /bin/bash
+oc run -it --restart=Never javatest --image=redhat-openjdk-18/openjdk18-openshift --command -- /bin/bash
 If you don't see a command prompt, try pressing enter.
 [jboss@javatest ~]$
 ```
@@ -75,8 +75,8 @@ fi
 Looking at the final `if` statement, we can see that if we send a `run.sh` script within a `bin` directory, it will be
 run. How can we do this? First, we need to ensure that this script is copied over during the assemble process. I'd
 encourage taking a detour and reading the `assemble` script within the S2I image to see that we can specify
-`ARTIFACT_COPY_ARGS` to customize what gets copied out of the build process. We will specify this within our
-`BuildConfig` as follows:
+the environment variable, `ARTIFACT_COPY_ARGS`, to customize what gets copied out of the build process. We will specify
+this within our `BuildConfig` as follows:
 
 ```
 - apiVersion: v1
@@ -104,53 +104,53 @@ the copy command is run relative to the ephemeral `target` directory that maven 
 us as seen in the `pom.xml`:
 
 ```
-    <build>
+<build>
+    ...
+    <plugins>
         ...
-        <plugins>
-            ...
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/bin</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>bin</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>process-classes</id>
-                        <phase>process-classes</phase>
-                        <configuration>
-                            <target>
-                                <chmod file="target/bin/run.sh" perm="755"/>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+        <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+                <execution>
+                    <id>copy-resources</id>
+                    <phase>validate</phase>
+                    <goals>
+                        <goal>copy-resources</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${basedir}/target/bin</outputDirectory>
+                        <resources>
+                            <resource>
+                                <directory>bin</directory>
+                                <filtering>false</filtering>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+                <execution>
+                    <id>process-classes</id>
+                    <phase>process-classes</phase>
+                    <configuration>
+                        <target>
+                            <chmod file="target/bin/run.sh" perm="755"/>
+                        </target>
+                    </configuration>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
 ```
 
 The first plugin is the `maven-resources-plugin` which we setup to copy the `bin` directory into the build directory.
@@ -214,10 +214,10 @@ $ curl -k https://192.168.42.46:8443/.well-known/oauth-authorization-server
 }
 ```
 
-In the above, I'm using the external OpenShift API endpoint - but the internal `openshift.default.svc` returns the same
-exact content. The value we're interested in is the `authorization_endpoint` value. We can pull this out via a bit of
-scripting and use it to override the value in the `application.yml` file
-(remember the [ordering of Spring Boot property sources][4]):
+In the above, I'm using an external minishift API endpoint - but the internal `openshift.default.svc` endpoint returns
+the same content. The value we're interested in is the `authorization_endpoint` value. We can pull this out via a
+bit of scripting and use it to override the value in the `application.yml` file
+(remember the [ordering of Spring Boot property sources][4] allows us to override via Java system variables):
 
 ```
 authUri=$(curl -s -k \
@@ -230,7 +230,7 @@ export JAVA_OPTIONS="-Dsecurity.oauth2.client.userAuthorizationUri=${authUri} $J
 #### Setting up `clientId` and `clientSecret`
 
 The other two properties we did manually in Part 2 were the `clientId` and the `clientSecret` which came from the
-Service Account. For the `clientId`, we can add the necessary bits as environment variables to the DeploymentConfig.
+service account. For the `clientId`, we can add the necessary bits as environment variables to the DeploymentConfig.
 For the namespace value, we can utilize the [downward API][5] to pull it from `metadata.namespace`:
 
 ```
@@ -250,10 +250,10 @@ With these environment variables, we can construct the `clientId` property in ou
 export JAVA_OPTIONS="-Dsecurity.oauth2.client.clientId=system:serviceaccount:${NAMESPACE}:${SERVICE_ACCOUNT_NAME} $JAVA_OPTIONS"
 ```
 
-Next, we need the Service Account secret for the `clientSecret` property. To access this value within the container, we
-can change the Service Account the pod will run with and then OpenShift will mount the secret at
-`/run/secrets/kubernetes.io/serviceaccount/token` during runtime. Changing the Service Account is done in the
-DeploymentConfig in the following snippet where we utilize the fact that the Service Account we created in Part 2 has
+Next, we need the service account secret for the `clientSecret` property. To access this value within the container, we
+can change the service account the pod will run with and then OpenShift will mount the secret at
+`/run/secrets/kubernetes.io/serviceaccount/token` during runtime. Changing the service account is done in the
+DeploymentConfig in the following snippet where we utilize the fact that the service account we created in Part 2 has
 the same name as the `APPLICATION_NAME` parameter.
 
 ```
@@ -269,7 +269,7 @@ the same name as the `APPLICATION_NAME` parameter.
 ```
 
 
-With the `serviceAccountName`, we tell OpenShift to run the container with our specific Service Account, rather than the
+With the `serviceAccountName`, we tell OpenShift to run the container with our specific service account, rather than the
 default one. Now within our `run.sh` script, we can setup the `clientSecret` property:
 
 ```
@@ -298,9 +298,9 @@ export JAVA_OPTIONS="-Dsecurity.oauth2.client.userAuthorizationUri=${authUri} $J
 exec /opt/run-java/run-java.sh $*
 ```
 
-Notice that at the end, we call the same script that is executed by default if we had provided our own `run.sh` script.
-In addition, we are utilizing the functionality of the `run-java.sh` script to pull in our changes to the `JAVA_OPTIONS`
-environment variable.
+Notice that at the end of the script, we call the same script that is executed by default if we had not provided our own
+`run.sh` script. In addition, we are utilizing the functionality of the `run-java.sh` script to pull in our changes to
+the `JAVA_OPTIONS` environment variable.
 
 With this part, we have improved upon the configuration done in Part 2 to make our OpenShift OAuth configuration
 portable and automatic. In Part 4, we'll take a look at adding an OpenShift Authorities Extractor.

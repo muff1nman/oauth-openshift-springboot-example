@@ -99,8 +99,8 @@ preparation in order to get `clientId` and `clientSecret`.
 #### Setting up a Service Account
 
 For the client to interact with the OpenShift OAuth server, an identity is needed. This identity is setup via an
-[OpenShift Service Account][2]. This service account is declared within the OpenShift template and is instantiated with
-the other OpenShift objects when one processes the template as was done in Part 1. The Service Account declaration is as
+[OpenShift service account][2]. This service account is declared within the OpenShift template and is instantiated with
+the other OpenShift objects when one processes the template as was done in Part 1. The service account declaration is as
 follows:
 
 ```
@@ -139,7 +139,7 @@ place, we can use it for the `clientId` and `clientSecret` for our OAuth client.
 qualified name of the service account of the form `system:serviceaccounts:<project_name>:<service account name>`, i.e.
 `system:serviceaccounts:oauth-example:spring-boot-oauth-app`.
 
-For the `clientSecret`, the Service Account's secret token is used. One can retrieve this via the `oc serviceaccounts
+For the `clientSecret`, the service account's secret token is used. One can retrieve this via the `oc serviceaccounts
 get-token` command:
 
 ```
@@ -235,7 +235,7 @@ To recount the parts here, we covered:
 - Maven Dependencies for Spring Security and OAuth
 - Enabling OAuth client via an annotation
 - Configuring the OAuth client in the application properties
-- Setting up an OpenShift Service Account with an OAuth Redirect URI annotation
+- Setting up an OpenShift service account with an OAuth Redirect URI annotation
 - Adding a Spring bean to map from the OpenShift JSON object to a Spring Principal object.
 
 In the next part, we'll take a look at automating the OAuth client configuration.
