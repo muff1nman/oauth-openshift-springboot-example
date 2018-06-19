@@ -302,7 +302,7 @@ Notice that at the end, we call the same script that is executed by default if w
 In addition, we are utilizing the functionality of the `run-java.sh` script to pull in our changes to the `JAVA_OPTIONS`
 environment variable.
 
-With this Part, we have improved upon the configuration done in Part 2 to make our OpenShift OAuth configuration
+With this part, we have improved upon the configuration done in Part 2 to make our OpenShift OAuth configuration
 portable and automatic. In Part 4, we'll take a look at adding an OpenShift Authorities Extractor.
 
 [1]: https://docs.openshift.com/container-platform/3.6/creating_images/s2i.html#s2i-scripts
